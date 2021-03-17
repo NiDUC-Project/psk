@@ -11,7 +11,7 @@
 * Szum musi dać się regulować, żeby potem sprawdzić jaki szum był krytyczny dla danego kluczenia
 
 #### 3. Demodulator (komputer B):
-* Odbiera sygnał jakoś zmodyfikowaną funkcję trygonometryczną z szumami
+* Odbiera sygnał jako zmodyfikowaną funkcję trygonometryczną z szumami
 * Odczytanie przesunięć fazowych 
 * Narysowanie diagramów konstelacji (na płaszczyźnie liczb zespolonych)
 * Podczas odczytywania, klasyfikowanie pobranych punktów do odpowiednich grup na wykresie (tak żeby można było odczytać jakie znaki koduje dany punkt)
