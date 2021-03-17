@@ -1,4 +1,4 @@
-##Phase Shift Keying
+## Phase Shift Keying
 
 #### 1. Modulator (komputer A):
 * wczytanie obrazu do programu python
