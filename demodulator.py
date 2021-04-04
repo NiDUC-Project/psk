@@ -4,7 +4,7 @@ import matplotlib.pylab as plt
 
 
 class Demodulator:
-    def __init__(self, period=6, frequency=1/6, amplitude=1, sample_rate=1000):
+    def __init__(self, period=6, frequency=1/6, amplitude=1, sample_rate=100):
         """ Set default parameters for modulation
 
             Parameters
@@ -45,10 +45,6 @@ class Demodulator:
         pattern_sin_time = np.arange(0, self.__period, 1 / self.__sample_rate)
         pattern_sinwave = self.__amplitude * np.sin(2 * np.pi * self.__frequency * pattern_sin_time + theta)
 
-        # some noises
-        length = len(sinwave)                                   #jakieś tam zakłócenia
-        sinwave = sinwave + 0.001 * np.random.randn(length)
-
         for bit in range(0, len(sinwave), self.__period*self.__sample_rate):
             # take each single period of signal
             start_of_sample = bit
@@ -83,9 +79,12 @@ class Demodulator:
            complex_numbers: list
                 list with complex number
        """
-        # draw constelation diagram
-        plt.plot(np.real(complex_numbers), np.imag(complex_numbers), '.')
-        plt.axhline(0, color='green')
-        plt.axvline(0, color='green')
-        plt.grid(True)
-        plt.show()
+        try:
+            # draw constelation diagram
+            plt.plot(np.real(complex_numbers), np.imag(complex_numbers), '.')
+            plt.axhline(0, color='green')
+            plt.axvline(0, color='green')
+            plt.grid(True)
+            plt.show()
+        except IOError as error:
+            print("OS error: {0}".format(error))

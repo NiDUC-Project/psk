@@ -3,7 +3,7 @@ from wireless_signal import WirelessSignal
 
 
 class Modulator:
-    def __init__(self, period=6, frequency=1/6.0, amplitude=1, sample_rate=1000):
+    def __init__(self, period=6, frequency=1/6.0, amplitude=1, sample_rate=100):
         """ Set default parameters for modulation
 
             Parameters

@@ -58,14 +58,17 @@ class WirelessSignal:
 
     def show_signal(self):
         """ Show WirelessSignal on the plot """
-        plt.plot(self.__linspace, self.__sinwave)
-        plt.xlabel('time[s]')
-        plt.ylabel('sin(x)')
-        plt.axis('tight')
-        plt.grid(True)
-        plt.show()
+        try:
+            plt.plot(self.__linspace, self.__sinwave)
+            plt.xlabel('time[s]')
+            plt.ylabel('sin(x)')
+            plt.axis('tight')
+            plt.grid(True)
+            plt.show()
 
-        # plotting
-        # fig = go.Figure(layout=dict(xaxis=dict(title='Time (sec)'), yaxis=dict(title='Amplitude')))
-        # fig.add_scatter(self.__linspace, self.__sinwave)
-        # fig.show()
+            # # plotting
+            # fig = go.Figure(layout=dict(xaxis=dict(title='Time (sec)'), yaxis=dict(title='Amplitude')))
+            # fig.add_scatter(self.__linspace, self.__sinwave)
+            # fig.show()
+        except IOError as error:
+            print("OS error: {0}".format(error))
