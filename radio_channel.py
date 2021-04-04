@@ -23,7 +23,7 @@ class Channel:
         """
         self.__noise_strength = noise_strength
 
-    def send_signal(self, wireless_signal, noise_strength):
+    def send_signal(self, wireless_signal, noise_strength=None):
         """ Get some WirelessSignal and returns that signal with some noise.
 
             Parameters
@@ -49,7 +49,28 @@ class Channel:
         # Add some noises
         sinwave = wireless_signal.get_sinwave()
         length = len(sinwave)
+
         noise = self.__noise_strength * np.random.normal(0, 1, length)
-        wireless_signal.set_sinwave(sinwave + noise)                        # 15 * np.random.randn(length)
+        wireless_signal.set_sinwave(sinwave + noise)        # 15 * np.random.randn(length)
 
         return wireless_signal
+
+    def add_noise_to_complex(self, complex_numbers):
+        """ Demodulates given signal (WirelessSignal) to list of bits based on bpsk modulation
+
+           Parameters
+           ----------
+           complex_numbers: list
+                List of complex numbers representing a sine signal
+
+           Returns
+           -------
+            complex_numbers : list
+               List of complex numbers with added noise with strength of channel noise_strength
+        """
+
+        # Generate Gauss noise, AWGN with unity power
+        noise = (np.random.randn(len(complex_numbers)) + 1j * np.random.randn(len(complex_numbers))) / np.sqrt(2)
+        # Add Gauss noise to complex numbers
+        complex_numbers = complex_numbers + noise * np.sqrt(self.__noise_strength)
+        return complex_numbers

@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pylab as plt
+from radio_channel import Channel
 
 
 class Demodulator:
@@ -23,18 +24,20 @@ class Demodulator:
         self.__amplitude = amplitude
         self.__sample_rate = sample_rate
 
-    def make_bpsk_demod(self, data_signal):
+    def make_bpsk_demod(self, data_signal, channel):
         """ Demodulates given signal (WirelessSignal) to list of bits based on bpsk modulation
 
-           Parameters
-           ----------
-           data_signal: WirelessSignal
+            Parameters
+            ----------
+            data_signal: WirelessSignal
                 Given signal
+            channel : Channel
+                Channel responsible for delivering data_signal
 
-           Returns
-           -------
-            bits : list
-               List of bits read from given signal
+            Returns
+            -------
+                bits : list
+                List of bits read from given signal
         """
         sinwave = data_signal.get_sinwave()
         complex_numbers = []
@@ -49,12 +52,12 @@ class Demodulator:
             # take each single period of signal
             start_of_sample = bit
             end_of_sample = bit + self.__period*self.__sample_rate
-            a = sinwave[start_of_sample:end_of_sample]
+            sample = sinwave[start_of_sample:end_of_sample]
 
             # calculate phase shift between pattern and the next fragment of signal
             # dot - iloczyn skalrany dwóch argumentów
-            phi = math.acos(np.dot(pattern_sinwave, a)/(np.linalg.norm(pattern_sinwave)*np.linalg.norm(a)))
-            print(phi)
+            phi = math.acos(np.dot(pattern_sinwave, sample)/(np.linalg.norm(pattern_sinwave)*np.linalg.norm(sample)))
+            # print(phi)
 
             if phi < np.pi/2 or phi >= 3*np.pi/2:       # jeśli faza mieści się w zakresie dla 1
                 result_data_bits.append(1)
@@ -67,6 +70,7 @@ class Demodulator:
             # print("Rel_cos: " + str(np.cos(phi)) + " Ima_sin: " + str(np.sin(phi)))
             complex_numbers.append(complex_num)
 
+        complex_numbers = channel.add_noise_to_complex(complex_numbers)
         self.draw_constellation_diagram(complex_numbers)
         return result_data_bits
 

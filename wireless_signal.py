@@ -1,5 +1,5 @@
 import matplotlib.pylab as plt
-import plotly.graph_objects as go
+# import plotly.graph_objects as go
 
 
 class WirelessSignal:
@@ -70,5 +70,5 @@ class WirelessSignal:
             # fig = go.Figure(layout=dict(xaxis=dict(title='Time (sec)'), yaxis=dict(title='Amplitude')))
             # fig.add_scatter(self.__linspace, self.__sinwave)
             # fig.show()
-        except IOError as error:
-            print("OS error: {0}".format(error))
+        except Exception as error:
+            print("Exception: {0}".format(error))

@@ -62,6 +62,6 @@ class Modulator:
             elif bit == 0:
                 sinwave.extend(sinwave2)    # if bit == 0 add period with phase 1
 
-        print(len(bits))
+        # print(len(bits))
         out_signal = WirelessSignal(timeline, sinwave)
         return out_signal
