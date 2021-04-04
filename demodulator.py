@@ -59,10 +59,11 @@ class Demodulator:
             phi = math.acos(np.dot(pattern_sinwave, sample)/(np.linalg.norm(pattern_sinwave)*np.linalg.norm(sample)))
             # print(phi)
 
-            if phi < np.pi/2 or phi >= 3*np.pi/2:       # jeśli faza mieści się w zakresie dla 1
-                result_data_bits.append(1)
-            elif phi >= np.pi/2 or phi < 3*np.pi/2:     # jeśli faza mieści się w zakresie dla 0
-                result_data_bits.append(0)
+            # ALTERNATYWNA WCZEŚNIEJSZA WERSJA
+            # if phi < np.pi/2 or phi >= 3*np.pi/2:       # jeśli faza mieści się w zakresie dla 1
+            #     result_data_bits.append(1)
+            # elif phi >= np.pi/2 or phi < 3*np.pi/2:     # jeśli faza mieści się w zakresie dla 0
+            #     result_data_bits.append(0)
 
             # calculate complex number to draw a constalation diagram
             complex_num = np.cos(phi) + 1j * np.sin(phi)
@@ -71,6 +72,13 @@ class Demodulator:
             complex_numbers.append(complex_num)
 
         complex_numbers = channel.add_noise_to_complex(complex_numbers)
+        result_data_bits = []
+        for com in complex_numbers:
+            if np.real(com) > 0:
+                result_data_bits.append(1)
+            elif np.real(com) <= 0:
+                result_data_bits.append(0)
+
         self.draw_constellation_diagram(complex_numbers)
         return result_data_bits
 

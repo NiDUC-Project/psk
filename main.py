@@ -38,7 +38,7 @@ def test2():
     signal.show_signal()
 
     # send signal to channel
-    signal = channel.send_signal(signal, 0.01)
+    signal = channel.send_signal(signal, 0.4)
 
     # demodulator receives signal
     result_bits = demodulator.make_bpsk_demod(signal, channel)
