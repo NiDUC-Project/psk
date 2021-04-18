@@ -66,7 +66,7 @@ class WirelessSignal:
             plt.grid(True)
             plt.show()
 
-            # # plotting
+        # # plotting
             # fig = go.Figure(layout=dict(xaxis=dict(title='Time (sec)'), yaxis=dict(title='Amplitude')))
             # fig.add_scatter(self.__linspace, self.__sinwave)
             # fig.show()
