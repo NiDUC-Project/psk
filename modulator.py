@@ -85,9 +85,13 @@ class Modulator:
 
         signalBits = bits.copy()
 
+        # We need to check if signal has odd number of bits
+        odd_number_of_bits = False
+
         # Deal with odd-sized signal
         if len(signalBits) % 2 != 0:
             signalBits.append(0)
+            odd_number_of_bits = True
 
         start_time = 0
         end_time = self.__period * len(signalBits) / 2
@@ -117,6 +121,10 @@ class Modulator:
             elif signalBits[i] == 1 and signalBits[i + 1] == 0:  # theta4 case
                 sinwave.extend(sinwave4)
         signal = WirelessSignal(timeline, sinwave)
+
+        # save information about odd number of bits
+        if odd_number_of_bits:
+            signal.was_odd = True
 
         demodulator = Demodulator()
         return signal

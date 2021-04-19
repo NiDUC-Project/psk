@@ -57,6 +57,7 @@ def test3():
     picture_pbm.read_pbm("computerA\\small.pbm")
     picture_pbm.multiply_pbm(10, "computerA\\10_times_small.pbm")
 
+
 def test4():
     # tests sending pbm from computerA to computerB with bpsk
     picture_pbm = PbmClass()
@@ -71,7 +72,7 @@ def test4():
     signal.show_signal()
 
     # send signal to channel
-    signal = channel.send_signal(signal, 0.4)
+    signal = channel.send_signal(signal, 0.1)
 
     # demodulator receives signal
     result_bits = demodulator.make_qpsk_demod(signal, channel)
@@ -83,4 +84,21 @@ def test4():
     # picture_pbm_result.bits = result_bits
     picture_pbm_result.write_pbm("computerB\\recieved.pbm")
 
-test4()
+
+def test5():
+    lista = [1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1]
+    modulator = Modulator()
+    demodulator = Demodulator()
+    channel = Channel()
+
+    signal = modulator.make_qpsk_mod(lista)
+    signal.show_signal()
+    signal = channel.send_signal(signal, 0.1)
+    signal.show_signal()
+    bits = demodulator.make_qpsk_demod(signal, channel)
+    print(bits)
+
+
+
+
+test5()

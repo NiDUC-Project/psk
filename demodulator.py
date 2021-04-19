@@ -4,8 +4,11 @@ import matplotlib.pylab as plt
 from radio_channel import Channel
 from scipy.stats import pearsonr
 
+from wireless_signal import WirelessSignal
+
+
 class Demodulator:
-    def __init__(self, period=6, frequency=1/6, amplitude=1, sample_rate=100):
+    def __init__(self, period=6, frequency=1 / 6, amplitude=1, sample_rate=100):
         """ Set default parameters for modulation
 
             Parameters
@@ -23,6 +26,7 @@ class Demodulator:
         self.__frequency = frequency
         self.__amplitude = amplitude
         self.__sample_rate = sample_rate
+
     def __generate_complex_qpsk(self, data_signal):
         """
         Generate complex number array out out input signal.
@@ -48,36 +52,34 @@ class Demodulator:
         pattern_sinwave3 = self.__amplitude * np.sin(2 * np.pi * self.__frequency * pattern_sin_time + theta3)
         pattern_sinwave4 = self.__amplitude * np.sin(2 * np.pi * self.__frequency * pattern_sin_time + theta4)
 
+        for bit in range(0, len(sinwave), self.__period * self.__sample_rate):
+            # take each single period of signal
+            start_of_sample = bit
+            end_of_sample = bit + self.__period * self.__sample_rate
+            sample = sinwave[start_of_sample:end_of_sample]
 
-        for bit in range(0, len(sinwave), self.__period*self.__sample_rate):
-                # take each single period of signal
-                start_of_sample = bit
-                end_of_sample = bit + self.__period*self.__sample_rate
-                sample = sinwave[start_of_sample:end_of_sample]
+            # Find the phase shift using pearson correlation.
+            coeff1, _ = pearsonr(sample, pattern_sinwave1)
+            coeff2, _ = pearsonr(sample, pattern_sinwave2)
+            coeff3, _ = pearsonr(sample, pattern_sinwave3)
+            coeff4, _ = pearsonr(sample, pattern_sinwave4)
 
-                # Find the phase shift using pearson correlation.
-                coeff1, _ = pearsonr(sample, pattern_sinwave1)
-                coeff2, _ = pearsonr(sample, pattern_sinwave2)
-                coeff3, _ = pearsonr(sample, pattern_sinwave3)
-                coeff4, _ = pearsonr(sample, pattern_sinwave4)
+            maxval = max(coeff1, coeff2, coeff3, coeff4)
 
-                maxval = max(coeff1, coeff2, coeff3, coeff4)
+            if maxval == coeff1:
+                phi = np.pi / 4
+            elif maxval == coeff2:
+                phi = 3 * np.pi / 4
+            elif maxval == coeff3:
+                phi = 5 * np.pi / 4
+            elif maxval == coeff4:
+                phi = 7 * np.pi / 4
 
-                if maxval == coeff1:
-                    phi = np.pi/4
-                elif maxval == coeff2:
-                    phi = 3*np.pi/4
-                elif maxval == coeff3:
-                    phi = 5*np.pi/4
-                elif maxval == coeff4:
-                    phi = 7*np.pi/4
+            # calculate complex number to draw a constalation diagram
+            complex_num = np.cos(phi) + 1j * np.sin(phi)
 
-                # calculate complex number to draw a constalation diagram
-                complex_num = np.cos(phi) + 1j * np.sin(phi)
-
-                complex_numbers.append(complex_num)
+            complex_numbers.append(complex_num)
         return complex_numbers
-
 
     def make_bpsk_demod(self, data_signal, channel):
         """ Demodulates given signal (WirelessSignal) to list of bits based on bpsk modulation
@@ -103,15 +105,16 @@ class Demodulator:
         pattern_sin_time = np.arange(0, self.__period, 1 / self.__sample_rate)
         pattern_sinwave = self.__amplitude * np.sin(2 * np.pi * self.__frequency * pattern_sin_time + theta)
 
-        for bit in range(0, len(sinwave), self.__period*self.__sample_rate):
+        for bit in range(0, len(sinwave), self.__period * self.__sample_rate):
             # take each single period of signal
             start_of_sample = bit
-            end_of_sample = bit + self.__period*self.__sample_rate
+            end_of_sample = bit + self.__period * self.__sample_rate
             sample = sinwave[start_of_sample:end_of_sample]
 
             # calculate phase shift between pattern and the next fragment of signal
             # dot - iloczyn skalrany dwóch argumentów
-            phi = math.acos(np.dot(pattern_sinwave, sample)/(np.linalg.norm(pattern_sinwave)*np.linalg.norm(sample)))
+            phi = math.acos(
+                np.dot(pattern_sinwave, sample) / (np.linalg.norm(pattern_sinwave) * np.linalg.norm(sample)))
             # print(phi)
 
             # ALTERNATYWNA WCZEŚNIEJSZA WERSJA
@@ -137,8 +140,7 @@ class Demodulator:
         self.draw_constellation_diagram(complex_numbers)
         return result_data_bits
 
-
-    def make_qpsk_demod(self, data_signal, channel):
+    def make_qpsk_demod(self, data_signal: WirelessSignal, channel: Channel):
         """ Demodulates given signal (WirelessSignal) to list of bits based on qpsk modulation
 
             Parameters
@@ -160,14 +162,19 @@ class Demodulator:
         complex_numbers = channel.add_noise_to_complex(complex_numbers)
         result_data_bits = []
         for com in complex_numbers:
-            if np.real(com) > 0 and np.imag(com) > 0:       #theta1
+            if np.real(com) > 0 and np.imag(com) > 0:  # theta1
                 result_data_bits.extend([1, 1])
-            elif np.real(com) > 0 and np.imag(com) < 0:     #theta4
+            elif np.real(com) > 0 and np.imag(com) < 0:  # theta4
                 result_data_bits.extend([1, 0])
-            elif np.real(com) < 0 and np.imag(com) > 0:     #theta2
+            elif np.real(com) < 0 and np.imag(com) > 0:  # theta2
                 result_data_bits.extend([0, 1])
-            elif np.real(com) < 0 and np.imag(com) < 0:     #theta3
+            elif np.real(com) < 0 and np.imag(com) < 0:  # theta3
                 result_data_bits.extend([0, 0])
+
+        # if we had an odd number of bits we added one and now it is necessary, we can remove that
+        print(data_signal.was_odd)
+        if data_signal.was_odd is True:
+            result_data_bits.pop()
 
         self.draw_constellation_diagram(complex_numbers)
         return result_data_bits
