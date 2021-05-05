@@ -5,22 +5,20 @@ from wireless_signal import WirelessSignal
 
 
 class Modulator:
-    def __init__(self, period=6, frequency=1 / 6.0, amplitude=1, sample_rate=100):
+    def __init__(self, period=6, amplitude=1, sample_rate=100):
         """ Set default parameters for modulation
 
             Parameters
             ----------
             period : number (int, float...)
                 Period
-            frequency: float
-                Frequency, inverse of period
             amplitude: number (int, float...)
                 Amplitude, signal strength
             sample_rate: int
                 Sample rate, number of samples per milisecond
         """
         self.__period = period
-        self.__frequency = frequency
+        self.__frequency = 1/period
         self.__amplitude = amplitude
         self.__sample_rate = sample_rate
 

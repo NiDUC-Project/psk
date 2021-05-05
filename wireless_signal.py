@@ -65,6 +65,7 @@ class WirelessSignal:
             plt.ylabel('sin(x)')
             plt.axis('tight')
             plt.grid(True)
+            plt.title("Wireless signal")
             plt.show()
 
         # # plotting

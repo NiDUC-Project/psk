@@ -5,7 +5,7 @@ from radio_channel import Channel
 from wireless_signal import WirelessSignal
 
 
-def test1():
+def test_bpsk(noise_strength):
     in_bits = [1, 0, 1, 0, 1, 0, 0]
     modulator = Modulator()
     demodulator = Demodulator()
@@ -16,7 +16,7 @@ def test1():
     signal = modulator.make_bpsk_mod(in_bits)
     signal.show_signal()
     # send signal over the channel
-    signal = channel.send_signal(signal, 0.1)
+    signal = channel.send_signal(signal, noise_strength)
     signal.show_signal()
     # demodulate the signal
     out_bits = demodulator.make_bpsk_demod(signal, channel)
@@ -24,7 +24,7 @@ def test1():
     print(out_bits)
 
 
-def test2():
+def test_bpsk_picture(noise_strength):
     # tests sending pbm from computerA to computerB with bpsk
     picture_pbm = PbmClass()
     picture_pbm.read_pbm(file_name="computerA\\10_times_small.pbm")
@@ -38,7 +38,7 @@ def test2():
     signal.show_signal()
 
     # send signal to channel
-    signal = channel.send_signal(signal, 0.4)
+    signal = channel.send_signal(signal, noise_strength)
 
     # demodulator receives signal
     result_bits = demodulator.make_bpsk_demod(signal, channel)
@@ -48,17 +48,17 @@ def test2():
     # picture_pbm_result.rows = picture_pbm.rows
     # picture_pbm_result.columns = picture_pbm.columns
     # picture_pbm_result.bits = result_bits
-    picture_pbm_result.write_pbm("computerB\\recieved.pbm")
+    picture_pbm_result.write_pbm("computerB\\recieved_bpsk.pbm")
 
 
-def test3():
+def test_pbm_mul():
     # tests magnifying pbm
     picture_pbm = PbmClass()
     picture_pbm.read_pbm("computerA\\small.pbm")
     picture_pbm.multiply_pbm(10, "computerA\\10_times_small.pbm")
 
 
-def test4():
+def test_qpsk_picture(noise_strength):
     # tests sending pbm from computerA to computerB with bpsk
     picture_pbm = PbmClass()
     picture_pbm.read_pbm(file_name="computerA\\10_times_small.pbm")
@@ -72,7 +72,7 @@ def test4():
     signal.show_signal()
 
     # send signal to channel
-    signal = channel.send_signal(signal, 0.1)
+    signal = channel.send_signal(signal, noise_strength)
 
     # demodulator receives signal
     result_bits = demodulator.make_qpsk_demod(signal, channel)
@@ -82,23 +82,25 @@ def test4():
     # picture_pbm_result.rows = picture_pbm.rows
     # picture_pbm_result.columns = picture_pbm.columns
     # picture_pbm_result.bits = result_bits
-    picture_pbm_result.write_pbm("computerB\\recieved.pbm")
+    picture_pbm_result.write_pbm("computerB\\recieved_qpsk.pbm")
 
 
-def test5():
-    lista = [1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1]
+def test_qpsk(noise_strength):
+    lista = [1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1]
     modulator = Modulator()
     demodulator = Demodulator()
     channel = Channel()
 
     signal = modulator.make_qpsk_mod(lista)
     signal.show_signal()
-    signal = channel.send_signal(signal, 0.1)
+    signal = channel.send_signal(signal, noise_strength)
     signal.show_signal()
     bits = demodulator.make_qpsk_demod(signal, channel)
     print(bits)
 
 
-
-
-test5()
+noise_strength = 0.1
+test_bpsk(noise_strength)
+test_bpsk_picture(noise_strength)
+test_qpsk(noise_strength)
+test_qpsk_picture(noise_strength)
