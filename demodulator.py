@@ -155,8 +155,6 @@ class Demodulator:
         """
         sinwave = data_signal.get_sinwave()
         complex_numbers = self.__generate_complex_qpsk(data_signal)
-        result_data_bits = []
-
         complex_numbers = channel.add_noise_to_complex(complex_numbers)
         result_data_bits = []
         for com in complex_numbers:
@@ -170,7 +168,6 @@ class Demodulator:
                 result_data_bits.extend([0, 0])
 
         # if we had an odd number of bits we added one and now it is necessary, we can remove that
-        print(data_signal.was_odd)
         if data_signal.was_odd is True:
             result_data_bits.pop()
 

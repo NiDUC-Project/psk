@@ -1,9 +1,9 @@
-from pbm_class import PbmClass
+from bitStream.pbm_class import PbmClass
 from modulator import Modulator
 from demodulator import Demodulator
 from radio_channel import Channel
 from wireless_signal import WirelessSignal
-
+from bitStream.FileBinaryIO import FileIO
 
 def test_bpsk(noise_strength):
     in_bits = [1, 0, 1, 0, 1, 0, 0]
@@ -99,6 +99,24 @@ def test_qpsk(noise_strength):
     print(bits)
 
 
+# Try sending PNG image through channel using qpsk
+def qpsk_send_png(noise_strength):
+    bit_list = FileIO('./computerA/cloud.png').read_from_file()
+    modulator = Modulator()
+    demodulator = Demodulator()
+    channel = Channel()
+    signal = modulator.make_qpsk_mod(bit_list)
+    signal.show_signal()
+
+    # With noise=0.1 the image is completely shattered, with noise=0.01 the image is fine
+    signal = channel.send_signal(signal, noise_strength)
+
+    result_bits = demodulator.make_qpsk_demod(signal, channel)
+
+    FileIO('./computerB/cloud.png').write_to_file(result_bits)
+
+
+qpsk_send_png(0.01)  # Try sending png file through the channel
 noise_strength = 0.1
 test_bpsk(noise_strength)
 test_bpsk_picture(noise_strength)
