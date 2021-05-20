@@ -16,6 +16,9 @@ class WirelessSignal:
         self.__linspace = linspace
         self.__sinwave = sinwave
         self.was_odd = False
+        self.was_one = False
+        self.was_two = False
+        self.was_three = False
 
     def get_linspace(self):
         """ Gets linspace of WirelessSignal
