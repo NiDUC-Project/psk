@@ -1,4 +1,6 @@
 import utils
+import csv
+
 from bitStream.pbm_class import PbmClass
 from modulator import Modulator
 from demodulator import Demodulator
@@ -100,7 +102,7 @@ def test_qpsk_picture(noise_strength):
     channel = Channel()
 
     # send signal to modulator
-    bits = FileIO("computerA\\img.png").read_from_file()
+    bits = FileIO("computerA\\cloud.png").read_from_file()
     signal = modulator.make_qpsk_mod(bits)
     signal.show_signal()
 
@@ -115,7 +117,7 @@ def test_qpsk_picture(noise_strength):
     # picture_pbm_result.rows = picture_pbm.rows
     # picture_pbm_result.columns = picture_pbm.columns
     # picture_pbm_result.bits = result_bits
-    FileIO("computerB\\recieved_qpsk_img.png").write_to_file(result_bits)
+    FileIO("computerB\\recieved_qpsk_cloud.png").write_to_file(result_bits)
 
 
 def test_8psk_picture(noise_strength):
@@ -125,7 +127,7 @@ def test_8psk_picture(noise_strength):
     channel = Channel()
 
     # send signal to modulator
-    bits = FileIO("computerA\\img.png").read_from_file()
+    bits = FileIO("computerA\\cloud.png").read_from_file()
     signal = modulator.make_8psk_mod(bits)
     signal.show_signal()
 
@@ -137,7 +139,8 @@ def test_8psk_picture(noise_strength):
 
     picture_pbm_result = PbmClass()
     picture_pbm_result.read_wireless_signal_from_bits(result_bits)
-    FileIO("computerB\\recieved_8psk_img.png").write_to_file(result_bits)
+    FileIO("computerB\\recieved_8psk_cloud.png").write_to_file(result_bits)
+
 
 def test_16psk_picture(noise_strength):
     # tests sending png from computerA to computerB with 16psk
@@ -146,7 +149,7 @@ def test_16psk_picture(noise_strength):
     channel = Channel()
 
     # send signal to modulator
-    bits = FileIO("computerA\\img.png").read_from_file()
+    bits = FileIO("computerA\\cloud.png").read_from_file()
     signal = modulator.make_16psk_mod(bits)
     signal.show_signal()
 
@@ -158,7 +161,86 @@ def test_16psk_picture(noise_strength):
 
     picture_pbm_result = PbmClass()
     picture_pbm_result.read_wireless_signal_from_bits(result_bits)
-    FileIO("computerB\\recieved_16psk_img.png").write_to_file(result_bits)
+    FileIO("computerB\\recieved_16psk_cloud.png").write_to_file(result_bits)
+
+
+def wrong_bits_test():
+    noise_strength = [0.001, 0.009, 0.01, 0.03, 0.05, 0.1, 0.2, 0.5]
+    bpsk = {}
+    qpsk = {}
+    psk8 = {}
+    psk16 = {}
+
+    # tests sending png from computerA to computerB with 16psk
+    modulator = Modulator()
+    demodulator = Demodulator()
+    channel = Channel()
+
+    # send signal to modulator
+    bits = FileIO("computerA\\cloud.png").read_from_file()
+
+    for noise in noise_strength:
+        # bpsk
+        signal1 = modulator.make_bpsk_mod(bits)
+        # send signal to channel
+        signal1 = channel.send_signal(signal1, noise)
+        result_bits1 = demodulator.make_bpsk_demod(signal1, channel)
+
+        # qpsk
+        signal2 = modulator.make_qpsk_mod(bits)
+        # send signal to channel
+        signal2 = channel.send_signal(signal2, noise)
+        result_bits2 = demodulator.make_qpsk_demod(signal2, channel)
+
+        # 8psk
+        signal3 = modulator.make_8psk_mod(bits)
+        # send signal to channel
+        signal3 = channel.send_signal(signal3, noise)
+        result_bits3 = demodulator.make_8psk_demod(signal3, channel)
+
+        # 16psk
+        signal4 = modulator.make_16psk_mod(bits)
+        # send signal to channel
+        signal4 = channel.send_signal(signal4, noise)
+        result_bits4 = demodulator.make_16psk_demod(signal4, channel)
+
+        # wrong bits counters
+        wrong_bpsk = 0
+        wrong_qpsk = 0
+        wrong_8psk = 0
+        wrong_16psk = 0
+
+        for i in range(len(result_bits1)):
+            # check how many wrong bits
+            if bits[i] != result_bits1[i]:
+                wrong_bpsk += 1
+            if bits[i] != result_bits2[i]:
+                wrong_qpsk += 1
+            if bits[i] != result_bits3[i]:
+                wrong_8psk += 1
+            if bits[i] != result_bits4[i]:
+                wrong_16psk += 1
+
+        bpsk[noise] = wrong_bpsk
+        qpsk[noise] = wrong_qpsk
+        psk8[noise] = wrong_8psk
+        psk16[noise] = wrong_16psk
+
+    out_file = open('wrong_bits.csv', 'w', newline='')
+    headers = ['noise', 'bpsk', 'qpsk', 'psk8', 'psk16', 'oryginal_size']
+    writer = csv.DictWriter(out_file, delimiter=';', lineterminator='\n', fieldnames=headers)
+
+    writer.writeheader()
+
+    for i in range(0, 8):
+        writer.writerow({'noise': noise_strength[i],
+                         'bpsk': str(list(bpsk.values())[i]).replace('.', ','),
+                         'qpsk': str(list(qpsk.values())[i]).replace('.', ','),
+                         'psk8': str(list(psk8.values())[i]).replace('.', ','),
+                         'psk16': str(list(psk16.values())[i]).replace('.', ','),
+                         'oryginal_size': len(bits)})
+
+    out_file.close()
 
 
 # Try sending PNG image through channel using qpsk
@@ -201,6 +283,7 @@ noise_strength = 0.1
 # test_8psk_picture(noise_strength)
 # test_16psk(noise_strength)
 # test_16psk_picture(noise_strength)
+# wrong_bits_test()
 # qpsk_img_compute_distorsion(noise_strength)
 
 NoiseToBitDistortion(0.01, 0.5, Psk.Qpsk, 0.02)
