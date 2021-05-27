@@ -1,5 +1,4 @@
 import bitarray
-import png
 
 
 class FileIO:

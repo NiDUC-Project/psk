@@ -1,3 +1,4 @@
+import utils
 from bitStream.pbm_class import PbmClass
 from modulator import Modulator
 from demodulator import Demodulator
@@ -176,7 +177,21 @@ def qpsk_send_png(noise_strength):
     FileIO("computerB\\cloud.png").write_to_file(result_bits)
 
 
-noise_strength = 0.03
+def qpsk_img_compute_distorsion(noise_strength):
+    bit_list = FileIO("computerA\\cloud.png").read_from_file()
+    modulator = Modulator()
+    demodulator = Demodulator()
+    channel = Channel()
+    signal = modulator.make_qpsk_mod(bit_list)
+
+    # With noise=0.1 the image is completely shattered, with noise=0.01 the image is fine
+    signal = channel.send_signal(signal, noise_strength)
+
+    result_bits = demodulator.make_qpsk_demod(signal, channel)
+    print("Number of distorted bits: ", utils.compute_distorted_bits(bit_list, result_bits))
+
+
+noise_strength = 0.1
 # test_bpsk(noise_strength)
 # test_bpsk_picture(noise_strength)
 # test_qpsk(noise_strength)
@@ -185,3 +200,4 @@ noise_strength = 0.03
 # test_8psk_picture(noise_strength)
 # test_16psk(noise_strength)
 # test_16psk_picture(noise_strength)
+qpsk_img_compute_distorsion(noise_strength)
