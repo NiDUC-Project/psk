@@ -2,9 +2,10 @@ import utils
 from bitStream.pbm_class import PbmClass
 from modulator import Modulator
 from demodulator import Demodulator
+from noise_to_bit_distortion import NoiseToBitDistortion, Psk
 from radio_channel import Channel
 from wireless_signal import WirelessSignal
-from bitStream.FileBinaryIO import FileIO
+from bitStream.file_binary_io import FileIO
 
 
 def test_bpsk(noise_strength):
@@ -200,4 +201,6 @@ noise_strength = 0.1
 # test_8psk_picture(noise_strength)
 # test_16psk(noise_strength)
 # test_16psk_picture(noise_strength)
-qpsk_img_compute_distorsion(noise_strength)
+# qpsk_img_compute_distorsion(noise_strength)
+
+NoiseToBitDistortion(0.01, 0.5, Psk.Qpsk, 0.02)
