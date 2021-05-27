@@ -10,6 +10,9 @@ from matplotlib import pyplot as plt
 
 
 class Psk(enum.Enum):
+    """
+    Types of psk.
+    """
     Bpsk = 0,
     Qpsk = 1,
     Psk8 = 2,
@@ -23,7 +26,15 @@ class NoiseToBitDistortion:
     """
 
     def __init__(self, start_noise: float, end_noise: float, psk_type: Psk, step=0.01):
-        distorter = None
+        """
+        Start benchmarking.
+        Parameters
+        ----------
+        start_noise Starting noise.
+        end_noise Ending noise (max to be reached).
+        psk_type Type of psk to be tested.
+        step Noise increase unit.
+        """
         self.start_noise = start_noise
         self.end_noise = end_noise
         self.psk_type = psk_type
@@ -38,10 +49,21 @@ class NoiseToBitDistortion:
         elif psk_type == Psk.Psk16:
             self.distorter = self.psk16
         self.original_bits = FileIO("computerA\\cloud.png").read_from_file()
-        self.start()
+        self._start()
 
     @staticmethod
     def bpsk(input_bits, noise):
+        """
+        Perform simple bpsk modulation-demodulation and return received bits.
+        Parameters
+        ----------
+        input_bits Bits to be trensfered.
+        noise Noise strength.
+
+        Returns
+        -------
+        bits Received bits.
+        """
         modulator = Modulator()
         demodulator = Demodulator()
         channel = Channel()
@@ -54,6 +76,17 @@ class NoiseToBitDistortion:
 
     @staticmethod
     def qpsk(input_bits, noise):
+        """
+        Perform simple qpsk modulation-demodulation and return received bits.
+        Parameters
+        ----------
+        input_bits Bits to be trensfered.
+        noise Noise strength.
+
+        Returns
+        -------
+        bits Received bits.
+        """
         modulator = Modulator()
         demodulator = Demodulator()
         channel = Channel()
@@ -66,6 +99,17 @@ class NoiseToBitDistortion:
 
     @staticmethod
     def psk8(input_bits, noise):
+        """
+        Perform simple 8-psk modulation-demodulation and return received bits.
+        Parameters
+        ----------
+        input_bits Bits to be trensfered.
+        noise Noise strength.
+
+        Returns
+        -------
+        bits Received bits.
+        """
         modulator = Modulator()
         demodulator = Demodulator()
         channel = Channel()
@@ -78,6 +122,17 @@ class NoiseToBitDistortion:
 
     @staticmethod
     def psk16(input_bits, noise):
+        """
+        Perform simple 16-psk modulation-demodulation and return received bits.
+        Parameters
+        ----------
+        input_bits Bits to be trensfered.
+        noise Noise strength.
+
+        Returns
+        -------
+        bits Received bits.
+        """
         modulator = Modulator()
         demodulator = Demodulator()
         channel = Channel()
@@ -88,12 +143,15 @@ class NoiseToBitDistortion:
         result_bits = demodulator.make_16psk_demod(signal, channel)
         return result_bits
 
-    def start(self):
+    def _start(self):
+        """
+        Internal function that performs the tests and draws resulting chart.
+        """
         distorted_bit_axis = []
         noise_axis = []
 
         for i in range(int(self.start_noise*100), int(self.end_noise*100), int(self.step*100)):
-            print("Testing noise=",i/100, "/",self.end_noise)
+            print("Testing noise=", i/100, "/", self.end_noise)
             out_bits = self.distorter(self.original_bits, i/100)
             num_distorted_bits = utils.compute_distorted_bits(self.original_bits, out_bits)
             distorted_bit_axis.append(num_distorted_bits)
